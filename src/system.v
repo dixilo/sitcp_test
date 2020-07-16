@@ -81,7 +81,7 @@ module system(
     assign an_adv_config_vector[0]     = 1'b1;    // SGMII
 
     wire [15:0] status_vector;
-    wire [1:0] pcspma_status_speed = status_vector[11:10];
+    wire [1:0] status_speed = status_vector[11:10];
 
     gig_ethernet_pcs_pma gepp_inst (
         .txn(phy_txn),                     // output wire txn
@@ -110,8 +110,8 @@ module system(
         .an_interrupt(an_interrupt),       // output wire an_interrupt
         .an_adv_config_vector(an_adv_config_vector),  // input wire [15 : 0] an_adv_config_vector
         .an_restart_config(1'b0),          // input wire an_restart_config
-        .speed_is_10_100(speed_is_10_100), // input wire speed_is_10_100
-        .speed_is_100(speed_is_100),       // input wire speed_is_100
+        .speed_is_10_100(status_speed != 2'b10), // input wire speed_is_10_100
+        .speed_is_100(status_speed == 2'b01),// input wire speed_is_100
         .status_vector(status_vector),     // output wire [15 : 0] status_vector
         .reset(sys_rst),                   // input wire reset
         .signal_detect(1'b1),              // input wire signal_detect
