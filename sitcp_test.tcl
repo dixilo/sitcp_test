@@ -52,9 +52,7 @@ set_property -dict [list \
     CONFIG.DIFFCLK_BOARD_INTERFACE {sgmii_phyclk} \
     CONFIG.Standard {SGMII} \
     CONFIG.Physical_Interface {LVDS} \
-    CONFIG.Management_Interface {true} \
-    CONFIG.Ext_Management_Interface {true} \
-    CONFIG.MDIO_BOARD_INTERFACE {mdio_mdc} \
+    CONFIG.Management_Interface {false} \
     CONFIG.SupportLevel {Include_Shared_Logic_in_Core} \
     CONFIG.LvdsRefClk {625} \
     CONFIG.GT_Location {X0Y11}] [get_ips gig_ethernet_pcs_pma]

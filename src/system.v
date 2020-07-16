@@ -3,7 +3,7 @@
 module system(
     input wire ext_reset_in,
     input wire clk_in1_p,
-    input wire clk_in1_n
+    input wire clk_in1_n,
 
     // phy signals
     input wire phy_clk_p,
@@ -12,7 +12,7 @@ module system(
     input wire phy_rxp,
     input wire phy_rxn,
     output wire phy_txp,
-    output wire phy_txn,
+    output wire phy_txn
 
     // MDIO
 //    input wire ext_mdio_i,
@@ -38,13 +38,14 @@ module system(
     wire gmii_rx_dv;
     wire gmii_rx_er;
 
+    wire dcm_locked;
 
     // Clocking wizard
     clk_wiz_0 clk_wiz_inst (
         .clk_in1_p(clk_in1_p),
         .clk_in1_n(clk_in1_n),	
         .reset(ext_reset_in),
-        .locked(),
+        .locked(dcm_locked),
         .clk_out1(sys_clk)
     );
 
@@ -52,9 +53,8 @@ module system(
     proc_sys_reset_0 sys_rst_inst (
         .slowest_sync_clk(sys_clk),
         .ext_reset_in(ext_reset_in),
-        .aux_reset_in(),
-        .mb_debug_sys_rst(),
-        .dcm_locked(),
+        .mb_debug_sys_rst(1'b0),
+        .dcm_locked(dcm_locked),
         .mb_reset(),
         .bus_struct_reset(),
         .peripheral_reset(sys_rst),
