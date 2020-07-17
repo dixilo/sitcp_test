@@ -24,6 +24,7 @@ add_files {\
 
 ### Constraints
 add_files -fileset constrs_1 -norecurse ../SiTCP_Netlist_for_Kintex_UltraScale/EDF_SiTCP_constraints.xdc
+add_files -fileset constrs_1 -norecurse ./src/system.xdc
 
 ## IP core generation
 ### System reset
@@ -34,15 +35,15 @@ set_property -dict [list CONFIG.RESET_BOARD_INTERFACE {reset}] [get_ips proc_sys
 create_ip -vlnv [latest_ip clk_wiz] -module_name clk_wiz_0
 set_property -dict [list \
     CONFIG.CLK_IN1_BOARD_INTERFACE {default_sysclk_300} \
-    CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {250} \
+    CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {200} \
     CONFIG.PRIM_SOURCE {Differential_clock_capable_pin} \
     CONFIG.PRIM_IN_FREQ {300.000} \
     CONFIG.CLKIN1_JITTER_PS {33.330000000000005} \
     CONFIG.MMCM_DIVCLK_DIVIDE {3} \
     CONFIG.MMCM_CLKIN1_PERIOD {3.333} \
     CONFIG.MMCM_CLKIN2_PERIOD {10.0} \
-    CONFIG.MMCM_CLKOUT0_DIVIDE_F {4.000} \
-    CONFIG.CLKOUT1_JITTER {109.006}] [get_ips clk_wiz_0]
+    CONFIG.MMCM_CLKOUT0_DIVIDE_F {5.000} \
+    CONFIG.CLKOUT1_JITTER {113.676}] [get_ips clk_wiz_0]
 
 
 ### Gig ethernet PCS PMA
@@ -57,29 +58,27 @@ set_property -dict [list \
     CONFIG.LvdsRefClk {625} \
     CONFIG.GT_Location {X0Y11}] [get_ips gig_ethernet_pcs_pma]
 
+### ILA
+create_ip -vlnv [latest_ip ila] -module_name ila_tcp
+set_property -dict [list \
+    CONFIG.C_PROBE0_WIDTH {8} \
+    CONFIG.C_DATA_DEPTH {2048} \
+    CONFIG.C_NUM_OF_PROBES {2}] [get_ips ila_tcp]
 
+# System
+set_property top system [current_fileset]
 
-# set project_system_dir "./${project_name}/${project_name}.srcs/sources_1/bd/system"
+# Run
+## Synthesis
 
-# set_property synth_checkpoint_mode None [get_files  $project_system_dir/system.bd]
-# generate_target {synthesis implementation} [get_files  $project_system_dir/system.bd]
-# make_wrapper -files [get_files $project_system_dir/system.bd] -top
+launch_runs synth_1
+wait_on_run synth_1
+open_run synth_1
+report_timing_summary -file timing_synth.log
 
-# import_files -force -norecurse -fileset sources_1 $project_system_dir/hdl/system_wrapper.v
-# set_property top system_wrapper [current_fileset]
-
-
-# # Run
-# ## Synthesis
-
-# launch_runs synth_1
-# wait_on_run synth_1
-# open_run synth_1
-# report_timing_summary -file timing_synth.log
-
-# # ## Implementation
-# set_property strategy Performance_Retiming [get_runs impl_1]
-# launch_runs impl_1 -to_step write_bitstream
-# wait_on_run impl_1
-# open_run impl_1
-# report_timing_summary -file timing_impl.log
+# ## Implementation
+set_property strategy Performance_Retiming [get_runs impl_1]
+launch_runs impl_1 -to_step write_bitstream
+wait_on_run impl_1
+open_run impl_1
+report_timing_summary -file timing_impl.log

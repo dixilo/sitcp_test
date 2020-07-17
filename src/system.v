@@ -8,7 +8,7 @@ module system(
     // phy signals
     input wire phy_clk_p,
     input wire phy_clk_n,
-    input wire phy_rst_n,
+    output wire phy_rst_n,
     input wire phy_rxp,
     input wire phy_rxn,
     output wire phy_txp,
@@ -54,6 +54,7 @@ module system(
         .slowest_sync_clk(sys_clk),
         .ext_reset_in(ext_reset_in),
         .mb_debug_sys_rst(1'b0),
+        .aux_reset_in(1'b0),
         .dcm_locked(dcm_locked),
         .mb_reset(),
         .bus_struct_reset(),
@@ -128,6 +129,9 @@ module system(
     wire tcp_close_req;
     wire tcp_close_ack;
 
+    wire tcp_rx_wr;
+    wire [7:0] tcp_rxd;
+
     wire tcp_tx_full;
     wire tcp_tx_wr;
     wire [7:0] tcp_txd;
@@ -190,9 +194,9 @@ module system(
         .TCP_CLOSE_REQ(tcp_close_req),// out	: Connection close request
         .TCP_CLOSE_ACK(tcp_close_ack),// in	: Acknowledge for closing
         // FIFO I/F
-        .TCP_RX_WC(),             // in : Rx FIFO write count[15:0] (Unused bits should be set 1)
-        .TCP_RX_WR(),             // out: Write enable
-        .TCP_RX_DATA(),           // out: Write data[7:0]
+        .TCP_RX_WC(16'b0),             // in : Rx FIFO write count[15:0] (Unused bits should be set 1)
+        .TCP_RX_WR(tcp_rx_wr),         // out: Write enable
+        .TCP_RX_DATA(tcp_rxd),// out: Write data[7:0]
         .TCP_TX_FULL(tcp_tx_full),// out: Almost full flag
         .TCP_TX_WR(tcp_tx_wr),    // in : Write enable
         .TCP_TX_DATA(tcp_txd),    // in : Write data[7:0]
@@ -204,6 +208,12 @@ module system(
         .RBCP_RE(rbcp_re),        // out: Read enable
         .RBCP_ACK(rbcp_ack),      // in : Access acknowledge
         .RBCP_RD(rbcp_rd)         // in : Read data[7:0]
+    );
+
+    ila_tcp ila_tcp_inst (
+        .clk(sys_clk),
+        .probe0(tcp_rxd), // input wire [7:0]  probe0  
+        .probe1(tcp_rx_wr) // input wire [0:0]  probe1
     );
 
 endmodule
