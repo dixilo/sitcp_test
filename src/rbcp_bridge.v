@@ -61,10 +61,12 @@ module rbcp_bridge(
 
     assign addr_res = addr_buf[1:0];
 
-    assign m_axi_wstrb[0] = (addr_res == 2'd0);
-    assign m_axi_wstrb[1] = (addr_res == 2'd1);
-    assign m_axi_wstrb[2] = (addr_res == 2'd2);
-    assign m_axi_wstrb[3] = (addr_res == 2'd3);
+    // Assuming big endian
+    assign m_axi_wstrb[3] = (addr_res == 2'd0);
+    assign m_axi_wstrb[2] = (addr_res == 2'd1);
+    assign m_axi_wstrb[1] = (addr_res == 2'd2);
+    assign m_axi_wstrb[0] = (addr_res == 2'd3);
+
 
     // awvalid
     reg awvalid_buf;
