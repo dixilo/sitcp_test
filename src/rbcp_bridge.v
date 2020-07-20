@@ -119,7 +119,7 @@ module rbcp_bridge(
             if (rbcp_we) begin
                 wvalid_buf <= 1'b1;
             end else if (wvalid_buf && m_axi_wready) begin
-                wvaild_buf <= 1'b0;
+                wvalid_buf <= 1'b0;
             end
         end
     end
@@ -155,6 +155,7 @@ module rbcp_bridge(
                 2'b00: rdata_buf <= m_axi_rdata[15:8];
                 2'b00: rdata_buf <= m_axi_rdata[7:0];
                 default: rdata_buf <= 0;
+                endcase
             end
         end
     end
