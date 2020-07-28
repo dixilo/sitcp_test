@@ -51,9 +51,15 @@ module adapter_8_32(
     input  wire        m_axi_rvalid, // read valid
     output wire        m_axi_rready, // read ready
     input  wire [1:0]  m_axi_rresp,  // read response
+
+    // control
+    input  wire [3:0]  araddr_res      // address residual
 );
 
     adapter_8_32_w w_inst(
+        .clk(clk),
+        .rst(rst),
+
         .s_axi_awaddr(s_axi_awaddr),
         .s_axi_awprot(s_axi_awprot),
         .s_axi_awvalid(s_axi_awvalid),
@@ -103,7 +109,8 @@ module adapter_8_32(
         .m_axi_rdata  (m_axi_rdata  ),
         .m_axi_rvalid (m_axi_rvalid ),
         .m_axi_rready (m_axi_rready ),
-        .m_axi_rresp  (m_axi_rresp  )
+        .m_axi_rresp  (m_axi_rresp  ),
+        .araddr_res   (araddr_res   )
     );
 
 endmodule

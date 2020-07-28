@@ -35,6 +35,9 @@ module rbcp_bridge(
     output wire        m_axi_rready, // read ready
     input  wire [1:0]  m_axi_rresp,  // read response
 
+    // control signal
+    output wire [3:0] araddr_res, // residual
+
     output wire [1:0] debug_rresp,
     output wire [1:0] debug_bresp
 );
@@ -67,6 +70,7 @@ module rbcp_bridge(
     assign m_axi_wstrb[1] = (addr_res == 2'd2);
     assign m_axi_wstrb[0] = (addr_res == 2'd3);
 
+    assign araddr_res = m_axi_wstrb;
 
     // awvalid
     reg awvalid_buf;
@@ -152,8 +156,8 @@ module rbcp_bridge(
                 case (addr_res)// Big endian
                 2'b00: rdata_buf <= m_axi_rdata[31:24];
                 2'b01: rdata_buf <= m_axi_rdata[23:16];
-                2'b00: rdata_buf <= m_axi_rdata[15:8];
-                2'b00: rdata_buf <= m_axi_rdata[7:0];
+                2'b10: rdata_buf <= m_axi_rdata[15:8];
+                2'b11: rdata_buf <= m_axi_rdata[7:0];
                 default: rdata_buf <= 0;
                 endcase
             end

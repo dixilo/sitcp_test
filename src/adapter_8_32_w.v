@@ -66,6 +66,8 @@ module adapter_8_32_w(
         end
     end
 
+    assign s_axi_awready = s_awready_buf;
+
     reg [31:0] s_awaddr_buf;
     wire s_awaddr_change = s_aw_en ? (s_awaddr_buf != s_axi_awaddr): 0;
     integer byte_index;
@@ -118,7 +120,11 @@ module adapter_8_32_w(
             wstrb_sum <= 4'b0000;
         end else begin
             if (w_acc) begin
-                wstrb_sum <= wstrb_sum | s_axi_wstrb;
+                if (s_awaddr_change) begin
+                    wstrb_sum <= 4'b0000 | s_axi_wstrb;
+                end else begin
+                    wstrb_sum <= wstrb_sum | s_axi_wstrb;
+                end
             end else if (wstrb_full) begin
                 wstrb_sum <= 4'b0000;
             end
@@ -126,7 +132,6 @@ module adapter_8_32_w(
     end
 
     /////////////////////////////////// Write response handling
-    reg s_bvalid_buf;
     assign s_axi_bresp = 2'b0; // not implemented yet
     wire b_acc = s_awready_buf && s_axi_awvalid && ~s_bvalid_buf && s_wready_buf && s_axi_wvalid;
 
@@ -143,6 +148,8 @@ module adapter_8_32_w(
             end
         end
     end
+
+    assign s_axi_bvalid = s_bvalid_buf;
 
     /*
         MASTER INTERFACE
